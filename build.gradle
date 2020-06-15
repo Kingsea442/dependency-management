@@ -1,0 +1,74 @@
+buildscript {
+    // repositories for build script dependencies
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:$dependencyManagementVersion"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'com.sea'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'maven-publish'
+afterEvaluate {
+    publishing {
+        publications {
+            mavenPom(MavenPublication) {
+                group = project.getGroup()
+                version = project.getVersion()
+            }
+        }
+    }
+
+    publishToMavenLocal {
+        doLast {
+            def pub = publishing.publications.mavenPom
+            println("artificat:${pub.groupId}:${pub.artifactId}:${pub.version}")
+        }
+    }
+
+    project.task('local').dependsOn(project.publishToMavenLocal)
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+apply plugin: "io.spring.dependency-management"
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+
+    dependencies {
+        // google
+        dependency "com.google.guava:guava:$guavaVersion"
+
+        // apache commons
+        dependency "commons-codec:commons-codec:$commonsCodecVersion"
+        dependency "commons-io:commons-io:$commonsIoVersion"
+        dependency "org.apache.commons:commons-collections4:$commonsCollections4Version"
+        dependency "org.apache.commons:commons-lang3:$commonsLang3Version"
+        dependency "org.apache.commons:commons-text:$commonsTextVersion"
+
+        // others
+        dependency "joda-time:joda-time:$jodaTimeVersion"
+        dependency "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+        dependency "com.alicp.jetcache:jetcache-anno:$jetCacheVersion"
+        dependency "com.alicp.jetcache:jetcache-core:$jetCacheVersion"
+        dependency "com.alicp.jetcache:jetcache-autoconfigure:$jetCacheVersion"
+        dependency "com.alicp.jetcache:jetcache-starter-redis:$jetCacheVersion"
+        dependency "com.alibaba:fastjson:$fastjsonVersion"
+        dependency "com.squareup.okhttp3:okhttp:$okhttpVersion"
+        dependency "com.github.dfabulich:sitemapgen4j:$sitemapgen4jVersion"
+    }
+}
